@@ -1,0 +1,4 @@
+**/.terraform/*
+
+# .terraform.lock.hcl - Terraform dependency lock file (optional to ignore)
+.terraform.lock.hcl
