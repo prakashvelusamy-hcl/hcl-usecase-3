@@ -158,27 +158,31 @@ resource "aws_instance" "DevLake" {
   security_groups = [aws_security_group.ec2_sg.id]
  # user_data = local.user_data_files[0]
   user_data = <<-EOF
-             #!/bin/bash
-         sudo apt update -y
-         sudo apt install -y docker git 
-         sudo apt install -y libxcrypt-compat
-         sudo systemctl enable docker
-         sudo systemctl start docker
-         sudo usermod -aG docker ubuntu
-         sleep 10
-         sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-         sudo chmod +x /usr/local/bin/docker-compose
-         
-         cd /home/ubuntu
-         git clone https://github.com/merico-dev/lake.git devlake-setup
-         cd devlake-setup
-         cp -arp devops/releases/lake-v0.21.0/docker-compose.yml ./
-         cp env.example .env
-         echo "ENCRYPTION_SECRET=super-secret-123" >> .env
-         
-         # Run Docker Compose
-         docker-compose up -d
-         sleep 30
+#!/bin/bash
+sudo apt update -y
+sudo apt install -y docker.io git curl
+
+# Enable and start Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+sudo usermod -aG docker ubuntu
+
+sleep 10
+
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+cd /home/ubuntu
+git clone https://github.com/merico-dev/lake.git devlake-setup
+cd devlake-setup
+cp -arp devops/releases/lake-v0.21.0/docker-compose.yml ./
+cp env.example .env
+ echo "ENCRYPTION_SECRET=password123" >> .env
+ docker-compose up -d
+# Wait for services to initialize
+sleep 30
         EOF
   tags = {
     Name = "Public-Instance-DevLake"
