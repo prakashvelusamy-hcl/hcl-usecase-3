@@ -224,7 +224,7 @@ resource "aws_lb_target_group" "tg2" {
  resource "aws_lb_target_group_attachment" "attach2" {
    target_group_arn = aws_lb_target_group.tg2.arn
    target_id        = aws_instance.DevLake.id
-   port             = 80
+   port             = 4000
  }
 
 
