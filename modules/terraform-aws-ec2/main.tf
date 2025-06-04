@@ -199,8 +199,7 @@ resource "aws_lb" "devlake" {
 
 
 resource "aws_lb_target_group" "tg2" {
-   count    = 1
-   name     = "tg-${count.index}"
+   name     = "tg-dev"
    port     = 80
    protocol = "HTTP"
    vpc_id   = var.vpc_id
@@ -219,8 +218,7 @@ resource "aws_lb_target_group" "tg2" {
 
 
  resource "aws_lb_target_group_attachment" "attach2" {
-   count            = 1
-   target_group_arn = aws_lb_target_group.tg2[count.index].arn
+   target_group_arn = aws_lb_target_group.tg2.arn
    target_id        = aws_instance.DevLake.id
    port             = 80
  }
@@ -232,7 +230,7 @@ resource "aws_lb_listener" "devlake" {
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg2[1].arn
+    target_group_arn = aws_lb_target_group.tg2.arn
   }
 }
 
