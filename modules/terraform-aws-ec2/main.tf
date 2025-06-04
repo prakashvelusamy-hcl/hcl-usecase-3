@@ -103,7 +103,7 @@ resource "aws_instance" "public_instances" {
 
 
 resource "aws_lb" "alb" {
-  name               = "usecase-1"
+  name               = "usecase-3"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -150,22 +150,92 @@ resource "aws_lb_listener" "http" {
 }
 
 
-# resource "aws_lb_listener_rule" "image" {
-#   count=2
-#   listener_arn = aws_lb_listener.http.arn
-#   priority     = 10
+resource "aws_instance" "DevLake" {
+  ami           = "ami-0e35ddab05955cf57"
+  instance_type = "t2.2xlarge"
+  subnet_id     = var.public_subnet_ids[2}
+  associate_public_ip_address = true
+  security_groups = [aws_security_group.ec2_sg.id]
+ # user_data = local.user_data_files[0]
+  user_data = <<-EOF
+             #!/bin/bash
+         sudo apt update -y
+         sudo apt install -y docker git 
+         sudo apt install -y libxcrypt-compat
+         sudo systemctl enable docker
+         sudo systemctl start docker
+         sudo usermod -aG docker ubuntu
+         sleep 10
+         sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+         sudo chmod +x /usr/local/bin/docker-compose
+         
+         cd /home/ubuntu
+         git clone https://github.com/merico-dev/lake.git devlake-setup
+         cd devlake-setup
+         cp -arp devops/releases/lake-v0.21.0/docker-compose.yml ./
+         cp env.example .env
+         echo "ENCRYPTION_SECRET=super-secret-123" >> .env
+         
+         # Run Docker Compose
+         docker-compose up -d
+         sleep 30
+  tags = {
+    Name = "Public-Instance-DevLake"
+  }
+}
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.tg[1].arn
-#   }
 
-#   condition {
-#     path_pattern {
-#       values = ["/image/*"]
-#     }
-#   }
-# }
+
+
+
+resource "aws_lb" "devlake" {
+  name               = "usecase-4"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = var.public_subnet_ids
+ }
+
+
+resource "aws_lb_target_group" "tg2" {
+   count    = 1
+   name     = "tg-${count.index}"
+   port     = 80
+   protocol = "HTTP"
+   vpc_id   = var.vpc_id
+   target_type = "instance"
+
+   health_check {
+     path                = "/"
+     protocol            = "HTTP"
+     matcher             = "200"
+     interval            = 30
+     timeout             = 5
+     healthy_threshold   = 2
+     unhealthy_threshold = 2
+   }
+ }
+
+
+ resource "aws_lb_target_group_attachment" "attach2" {
+   count            = 1
+   target_group_arn = aws_lb_target_group.tg2[count.index].arn
+   target_id        = aws_instance.public_instances[2].id
+   port             = 80
+ }
+
+
+resource "aws_lb_listener" "devlake" {
+  load_balancer_arn = aws_lb.devlake.arn
+  port              = 80
+  protocol          = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg2[1].arn
+  }
+}
+
+
 
 
 
