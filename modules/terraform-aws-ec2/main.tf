@@ -152,7 +152,7 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_instance" "DevLake" {
   ami           = "ami-0e35ddab05955cf57"
-  instance_type = "t2.2xlarge"
+  instance_type = "t2.xlarge"
   subnet_id     = var.public_subnet_ids[2]
   associate_public_ip_address = true
   security_groups = [aws_security_group.ec2_sg.id]
