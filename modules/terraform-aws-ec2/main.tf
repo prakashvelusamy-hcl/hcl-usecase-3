@@ -200,7 +200,7 @@ resource "aws_lb" "devlake" {
 
 resource "aws_lb_target_group" "tg2" {
    name     = "tg-dev"
-   port     = 80
+   port     = 4000
    protocol = "HTTP"
    vpc_id   = var.vpc_id
    target_type = "instance"
