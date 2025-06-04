@@ -221,7 +221,7 @@ resource "aws_lb_target_group" "tg2" {
  resource "aws_lb_target_group_attachment" "attach2" {
    count            = 1
    target_group_arn = aws_lb_target_group.tg2[count.index].arn
-   target_id        = aws_instance.public_instances[2].id
+   target_id        = aws_instance.DevLake.id
    port             = 80
  }
 
