@@ -179,6 +179,7 @@ resource "aws_instance" "DevLake" {
          # Run Docker Compose
          docker-compose up -d
          sleep 30
+        EOF
   tags = {
     Name = "Public-Instance-DevLake"
   }
