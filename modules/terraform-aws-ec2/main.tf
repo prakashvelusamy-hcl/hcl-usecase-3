@@ -40,12 +40,12 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-# locals {
-#   user_data_files = [
-#     file("${path.module}/userdata_1.sh"),
-#     file("${path.module}/userdata_2.sh")
-#   ]
-# }
+ locals {
+   user_data_files = [
+     file("${path.module}/userdata_1.sh"),
+     file("${path.module}/userdata_2.sh")
+   ]
+ }
 
 
 resource "aws_instance" "public_instances" {
