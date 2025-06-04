@@ -10,3 +10,6 @@ output "public_instance_ips" {
 output "alb_dns_name" {
   value = aws_lb.alb.dns_name
 }
+# output "test_user_data_content" {
+#   value = local.user_data_files[0]
+# }

@@ -14,9 +14,9 @@ resource "aws_security_group" "ec2_sg" {
   vpc_id      = var.vpc_id 
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -40,6 +40,12 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+# locals {
+#   user_data_files = [
+#     file("${path.module}/userdata_1.sh"),
+#     file("${path.module}/userdata_2.sh")
+#   ]
+# }
 
 
 resource "aws_instance" "public_instances" {
@@ -49,7 +55,7 @@ resource "aws_instance" "public_instances" {
   subnet_id     = var.public_subnet_ids[count.index]
   associate_public_ip_address = true
   security_groups = [aws_security_group.ec2_sg.id]
-
+  # user_data = local.user_data_files[0]
   user_data = <<-EOF
               #!/bin/bash
               apt-get update -y
@@ -107,12 +113,13 @@ resource "aws_instance" "public_instances" {
    description = "Allow HTTP inbound to ALB"
    vpc_id      = var.vpc_id
 
-   ingress {
-     from_port   = 80
-     to_port     = 80
-     protocol    = "tcp"
-     cidr_blocks = ["0.0.0.0/0"]
-   }
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
    egress {
      from_port   = 0

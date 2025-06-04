@@ -28,3 +28,6 @@ output "instance_public_ips" {
 output "alb_dns_name" {
   value = module.ec2.alb_dns_name
 }
+# output "test_user_data" {
+# value= module.ec2.test_user_data_content  
+# }
